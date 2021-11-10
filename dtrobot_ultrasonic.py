@@ -6,6 +6,7 @@ __email__ = ''
 __description__ = ''
 
 import time
+import threading
 from builtins import int, chr, object
 
 import dtrobot_gpio as gpio
@@ -17,8 +18,6 @@ motor = Motor()
 from dtrobot_servo import Servo
 servo = Servo()
 
-from xr_socket import Socket
-socket = Socket()
 
 class Ultrasonic():
     def __init__(self):
@@ -83,12 +82,8 @@ class Ultrasonic():
         dtrobot.DISTANCE = int(self.get_distance())
         if 1 < dtrobot.DISTANCE < 255:
             dtrobot.DISTANCE_INFO = bytes([0x03, 0x04, dtrobot.DISTANCE]) 	# 将超声波距离值上传到上位机
-            try:
-                socket.sendbuf(buf)
-            except Exception as e:  # 发送出错
-                print('send_distance error:', e)  # 打印出错信息
         else:
-            buf = []
+            dtrobot.DISTANCE_INFO = []
 
     def maze(self):
         """
@@ -165,13 +160,35 @@ class Ultrasonic():
             motor.stop()
             time.sleep(0.1)
     
-    def dtrobot_ultrasonic(self):
+    def ultrasonic_mode_info(self):
         while True:
             if len(dtrobot.ULTRASONIC_INFO):
-                if dtrobot.ULTRASONIC_INFO[0] == 0x03:
-                    if dtrobot.ULTRASONIC_INFO[1] == 0x01:
-                        self.send_distance()
+                if(dtrobot.ULTRASONIC_INFO[0] == 0x05):
+                    if dtrobot.ULTRASONIC_INFO[1] == 0x00:
+                        dtrobot.ULTRASONIC_MODE = 0
+                    elif dtrobot.ULTRASONIC_INFO[1] == 0x01:
+                        dtrobot.ULTRASONIC_MODE = 1
                     elif dtrobot.ULTRASONIC_INFO[1] == 0x02:
-                        self.avoidbyragar()
+                        dtrobot.ULTRASONIC_MODE = 2
                     elif dtrobot.ULTRASONIC_INFO[1] == 0x03:
-                        self.maze()
+                        dtrobot.ULTRASONIC_MODE = 3
+                    else:
+                        dtrobot.ULTRASONIC_MODE = 0
+                dtrobot.ULTRASONIC_INFO = []
+
+    def dtrobot_ultrasonic(self):
+        threads = []
+        t_mode_info = threading.Thread(target = self.ultrasonic_mode_info, args = ())
+        threads.append(t_mode_info)
+        for t in threads:
+            t.setDaemon(True)
+            t.start()
+            time.sleep(0.05)
+
+        while True:
+            if dtrobot.ULTRASONIC_MODE == 1:
+                self.send_distance()
+            elif dtrobot.ULTRASONIC_MODE == 2:
+                self.avoidbyragar()
+            elif dtrobot.ULTRASONIC_MODE == 3:
+                self.maze()

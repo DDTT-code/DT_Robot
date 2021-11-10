@@ -44,6 +44,11 @@ class Client():
             if len(dtrobot.INFRARED_INFO) == 0:
                 dtrobot.INFRARED_INFO = data
 
+        @sio.on('data_infrared_info', namespace = '/det_conf_data')
+        def on_camera_mode(sid, data):
+            if len(dtrobot.CAMERA_MODE_INFO) == 0:
+                dtrobot.CAMERA_MODE_INFO = data
+
         sio.connect('http://127.0.0.1:8080', namespaces = ['/det_conf_data'])
         while True:
             if len(dtrobot.CAMERA_INFO):

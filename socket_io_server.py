@@ -68,13 +68,11 @@ def on_camera(sid, data):
     # print(data)
     sio.emit('data_camera_info', str(data), room = det_conf_web_room, namespace = det_conf_web_name)
 
-
 # 接收网页发送的数据
 @sio.on('data_motor_info', namespace = det_conf_web_name)
 def on_motor(sid, data):
     # 发送到小车data
     sio.emit('data_motor_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
-
 
 # 接收网页发送的数据
 @sio.on('data_servo_info', namespace = det_conf_web_name)
@@ -82,7 +80,6 @@ def on_servo(sid, data):
     # 发送到小车data
     # print(data)
     sio.emit('data_servo_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
-
 
 # 接收网页发送的file
 @sio.on('data_file_transfer', namespace = det_conf_web_name)
@@ -96,8 +93,13 @@ def on_file(sid, data):
     sio.emit('data_ultrasonic_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
 
 @sio.on('data_infrared_info', namespace = det_conf_web_name)
-def on_file(sid, data):
+def on_infrared(sid, data):
     # 发送到小车file
     sio.emit('data_infrared_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
+
+@sio.on('data_camera_mode_info', namespace = det_conf_web_name)
+def on_camera_mode(sid, data):
+    # 发送到小车file
+    sio.emit('data_camera_mode_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
 
 eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 8080)), app)
