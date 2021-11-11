@@ -88,18 +88,19 @@ def on_file(sid, data):
     sio.emit('data_file_transfer', data, room = det_conf_file_room, namespace = det_conf_file_name)
 
 @sio.on('data_ultrasonic_info', namespace = det_conf_web_name)
-def on_file(sid, data):
-    # 发送到小车file
+def on_ultrasonic(sid, data):
+    # 发送到小车data
     sio.emit('data_ultrasonic_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
 
 @sio.on('data_infrared_info', namespace = det_conf_web_name)
 def on_infrared(sid, data):
-    # 发送到小车file
+    # 发送到小车data
     sio.emit('data_infrared_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
 
 @sio.on('data_camera_mode_info', namespace = det_conf_web_name)
 def on_camera_mode(sid, data):
-    # 发送到小车file
+    # 发送到小车data
+    print(data)
     sio.emit('data_camera_mode_info', data, room = det_conf_data_room, namespace = det_conf_data_name)
 
 eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 8080)), app)

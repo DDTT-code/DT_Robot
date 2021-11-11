@@ -16,16 +16,33 @@ import pyzbar.pyzbar as pyzbar
 import dtrobot_config as dtrobot
 from dtrobot_servo import Servo
 from dtrobot_motor import Motor
+from dtrobot_pid import PID
 
 servo = Servo()
 motor = Motor()
 
 class Camera():
     def __init__(self):
+        self.px_sum = 0  # 采样点x坐标累计值
         self.cap_open = 0
         self.ret = 0
         self.cap = None
         self.frame = None
+
+        self.servo_X = 7
+        self.servo_Y = 8
+
+        self.angle_X = 80
+        self.angle_Y = 20
+
+
+        self.X_pid = PID(0.03, 0.09, 0.0005)  # 实例化一个X轴坐标的PID算法PID参数：第一个代表pid的P值，二代表I值,三代表D值
+        self.X_pid.setSampleTime(0.005)  # 设置PID算法的周期
+        self.X_pid.setPoint(160)  # 设置PID算法的预值点，即目标值，这里160指的是屏幕框的x轴中心点，x轴的像素是320，一半是160
+
+        self.Y_pid = PID(0.035, 0.08, 0.002)  # 实例化一个X轴坐标的PID算法PID参数：第一个代表pid的P值，二代表I值,三代表D值
+        self.Y_pid.setSampleTime(0.005)  # 设置PID算法的周期
+        self.Y_pid.setPoint(160)  # 设置PID算法的预值点，即目标值，这里160指的是屏幕框的y轴中心点，y轴的像素是320，一半是160
     
     def frame2base64(self, frame):
         img = Image.fromarray(frame)

@@ -68,7 +68,7 @@ class Servo():
     def run_servo(self):
         while True:
             if len(dtrobot.SERVO_INFO):
-                if dtrobot.SERVO_INFO[1] == 0x01:
+                if dtrobot.SERVO_INFO[0] == 0x01:
                     if dtrobot.SERVO_INFO[1] == 0x01:
                         dtrobot.SERVO_CAMERA_ANGLE_Y = dtrobot.SERVO_CAMERA_ANGLE_Y + 20
                         self.set(dtrobot.SERVO_CAMERA_Y, dtrobot.SERVO_CAMERA_ANGLE_Y)
