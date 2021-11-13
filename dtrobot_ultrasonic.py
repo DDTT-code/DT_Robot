@@ -81,6 +81,7 @@ class Ultrasonic():
         """
         dtrobot.DISTANCE = int(self.get_distance())
         if 1 < dtrobot.DISTANCE < 255:
+            print(dtrobot.DISTANCE)
             dtrobot.DISTANCE_INFO = bytes([0x03, 0x04, dtrobot.DISTANCE]) 	# 将超声波距离值上传到上位机
         else:
             dtrobot.DISTANCE_INFO = []
@@ -94,10 +95,10 @@ class Ultrasonic():
         # print("超声波走迷宫函数")
         self.dis = self.get_distance()		# 获取距离值
         if self.MAZE_ABLE == 0 and ((self.dis > 30) or self.dis == 0):  # 前方没有障碍物时候并且不是死胡同
-            while ((self.dis > 30) or self.dis == 0) and dtrobot.CRUISING_FLAG:
+            while ((self.dis > 30) or self.dis == 0) and dtrobot.ULTRASONIC_MODE == 3:
                 self.dis = self.get_distance()
                 motor.forward()
-            if dtrobot.CRUISING_FLAG:		# 在退出模式时不运行这个，避免退出模式后仍然不停车
+            if dtrobot.ULTRASONIC_MODE == 3:		# 在退出模式时不运行这个，避免退出模式后仍然不停车
                 self.MAZE_CNT = self.MAZE_CNT+1
                 print(self.MAZE_CNT)
                 motor.stop()
@@ -116,17 +117,17 @@ class Ultrasonic():
             self.s_R = 0
             time.sleep(0.1)
             servo.set(7, 5)		# 先把超声波转动的舵机转到右边
-            if dtrobot.CRUISING_FLAG:
+            if dtrobot.ULTRASONIC_MODE == 3:
                 time.sleep(0.25)
             self.s_R = self.get_distance()
-            if dtrobot.CRUISING_FLAG:
+            if dtrobot.ULTRASONIC_MODE == 3:
                 time.sleep(0.2)
 
             servo.set(7, 175)		# 再把舵机转动到左边
-            if dtrobot.CRUISING_FLAG:
+            if dtrobot.ULTRASONIC_MODE == 3:
                 time.sleep(0.3)
             self.s_L = self.get_distance()
-            if dtrobot.CRUISING_FLAG:
+            if dtrobot.ULTRASONIC_MODE == 3:
                 time.sleep(0.2)
             servo.set(7, 80)		# 再把舵机转动到中间
             time.sleep(0.1)
@@ -136,7 +137,7 @@ class Ultrasonic():
                 dtrobot.LEFT_SPEED = 99		# 转向速度，如果在不同得地面需要实际手动调节其速度满足转向力度，这里是地毯上的速度需要高点
                 dtrobot.RIGHT_SPEED = 99
                 motor.right()
-                if dtrobot.CRUISING_FLAG:
+                if dtrobot.ULTRASONIC_MODE == 3:
                     time.sleep(dtrobot.MAZE_TURN_TIME/1000)			# 转向的时间，根据上面转向的速度调节，实测转到90度左右即可
                 dtrobot.LEFT_SPEED = 45
                 dtrobot.RIGHT_SPEED = 45
@@ -146,7 +147,7 @@ class Ultrasonic():
                 dtrobot.LEFT_SPEED = 99  	# 转向速度，如果在不同得地面需要实际手动调节其速度满足转向力度，这里是地毯上的速度需要高点
                 dtrobot.RIGHT_SPEED = 99
                 motor.left()
-                if dtrobot.CRUISING_FLAG:
+                if dtrobot.ULTRASONIC_MODE == 3:
                     time.sleep(dtrobot.MAZE_TURN_TIME/1000)		# 转向的时间，根据上面转向的速度调节，实测转到90度左右即可
                 dtrobot.LEFT_SPEED = 45
                 dtrobot.RIGHT_SPEED = 45
@@ -154,16 +155,16 @@ class Ultrasonic():
             else: 	# 前方不能走，左右都不能走，即进入了死胡同，只能原路返回
                 self.MAZE_ABLE = 1 		# 把标志置1，避免又重复进入死胡同，只能一点点后退再左右检测是否有其他通道，当左右通道任意一方畅通时标志位置0，才可往前进
                 motor.back()
-                if dtrobot.CRUISING_FLAG:
+                if dtrobot.ULTRASONIC_MODE == 3:
                     time.sleep(0.3)
 
-            motor.stop()
-            time.sleep(0.1)
+        motor.stop()
+        time.sleep(0.1)
     
     def ultrasonic_mode_info(self):
         while True:
             if len(dtrobot.ULTRASONIC_INFO):
-                if(dtrobot.ULTRASONIC_INFO[0] == 0x05):
+                if(dtrobot.ULTRASONIC_INFO[0] == 0x03):
                     if dtrobot.ULTRASONIC_INFO[1] == 0x00:
                         dtrobot.ULTRASONIC_MODE = 0
                     elif dtrobot.ULTRASONIC_INFO[1] == 0x01:

@@ -14,7 +14,7 @@ class Reset():
     def __init__(self):
         self.program_name = "dtrobot_main.py"
         self.src_path = "/home/pi/dt_robot/back_up"
-        self.dest_path = "/home/pi/dt_robot/python_src"
+        self.dest_path = "/home/pi/dt_robot/Code"
     
     def reset(self):
         order_str = "ps -aux | grep %s" % self.program_name
@@ -22,7 +22,7 @@ class Reset():
         strs_obj = os.popen(order_str)
         t_strs = strs_obj.read()
 
-        pid_lists = re.findall("(\d+).+python dtrobot_main.py", t_strs, re.I)
+        pid_lists = re.findall("(\d+).+python /home/pi/dt_robot/Code/dtrobot_main.py", t_strs, re.I)
 
         for i in pid_lists:
             print(int(i))
@@ -36,4 +36,4 @@ class Reset():
                     os.remove(self.dest_path + '/' + j)
             shutil.move(self.src_path +'/' + i, self.dest_path + '/' + i)
 
-        os.system('python dtrobot_main.py')
+        os.system('python /home/pi/dt_robot/Code/dtrobot_main.py')

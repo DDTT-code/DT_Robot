@@ -42,6 +42,7 @@ class Infrared():
         """
         红外避障
         """
+        motor.forward()
         if gpio.digital_read(gpio.IR_M) == 0:		# 如果中间传感器校测到物体
             motor.stop()
 
